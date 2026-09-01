@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📦 MD 阅读编辑器 · 版本二</title>
+
+    <!-- ===== 外部库 ===== -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js">
+    </script>
+
+    <!-- ===== 样式表 ===== -->
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/theme-default.css" id="themeStylesheet" />
+
+    <!-- ===== 脚本 ===== -->
+    <script src="scripts/storage.js" defer></script>
+    <script src="scripts/zip-handler.js" defer></script>
+    <script src="scripts/renderer.js" defer></script>
+    <script src="scripts/ui.js" defer></script>
+    <script src="scripts/app.js" defer></script>
+</head>
+<body>
+
+    <!-- ============================================================
+    加载遮罩
+    ============================================================ -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <span id="loadingText">处理中...</span>
+    </div>
+
+    <!-- ============================================================
+    主界面
+    ============================================================ -->
+    <div id="app" class="app">
+
+        <!-- ===== 侧边栏（项目列表） ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>📚 我的项目</h2>
+                <button id="newProjectBtn" title="上传新压缩包">＋</button>
+            </div>
+            <div class="sidebar-body" id="projectList">
+                <div class="empty-state">
+                    <span class="big-icon">📂</span>
+                    暂无项目<br />
+                    点击「＋」上传压缩包
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <button id="clearAllBtn" class="btn-danger">🗑️ 清除所有</button>
+            </div>
+        </aside>
+
+        <!-- ===== 主面板 ===== -->
+        <main class="main-panel">
+
+            <!-- 顶部栏 -->
+            <header class="main-header">
+                <div class="header-left">
+                    <span class="project-name" id="projectName">未选择项目</span>
+                    <span class="file-count" id="fileCount">0 个文件</span>
+                </div>
+                <div class="header-right">
+                    <select id="themeSelector">
+                        <option value="default">📖 默认（暖纸）</option>
+                        <option value="cyberpunk">💠 赛博朋克</option>
+                    </select>
+                    <button id="exportBtn" class="btn-primary">📦 导出</button>
+                </div>
+            </header>
+
+            <!-- 文件列表（当项目选中时显示） -->
+            <div class="file-list-bar" id="fileListBar">
+                <div class="file-list-scroll" id="fileListContainer">
+                    <span style="color:#8a7a6a;">请从左侧选择一个项目</span>
+                </div>
+            </div>
+
+            <!-- 内容区域 -->
+            <div class="content-area" id="contentArea">
+
+                <!-- 模式切换标签 -->
+                <div class="mode-tabs">
+                    <button class="mode-tab active" data-mode="view">👁️ 查看</button>
+                    <button class="mode-tab" data-mode="edit">✏️ 编辑</button>
+                    <span class="mode-status" id="fileStatus"></span>
+                </div>
+
+                <!-- 查看模式 -->
+                <div id="viewContainer" class="view-mode">
+                    <div class="markdown-body" id="markdownBody">
+                        <p style="color:#8a7a6a;text-align:center;padding:40px 0;">
+                            📂 请从左侧选择一个项目，然后点击文件
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 编辑模式 -->
+                <div id="editContainer" class="edit-mode hidden">
+                    <textarea class="edit-textarea" id="editTextarea" placeholder="在此编辑 Markdown 源码..."></textarea>
+                </div>
+
+            </div>
+
+            <!-- 底部状态栏 -->
+            <footer class="main-footer">
+                <span id="statusBar">就绪</span>
+                <span id="scrollInfo">行 0</span>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- ===== 隐藏的文件输入 ===== -->
+    <input type="file" id="zipUpload" accept=".zip" style="display:none;" />
+
+</body>
+</html>
