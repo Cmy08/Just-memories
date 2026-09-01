@@ -17,7 +17,6 @@ async function parseZipFile(file) {
 
             try {
                 const content = await zipEntry.async('string');
-                // 使用相对路径作为文件名
                 const filename = path;
                 files[filename] = {
                     content: content,
@@ -29,7 +28,6 @@ async function parseZipFile(file) {
             }
         }
 
-        // 生成项目ID（使用文件名+时间戳）
         const baseName = file.name.replace(/\.zip$/i, '') || '未命名项目';
         const timestamp = Date.now();
         const projectId = `${baseName}_${timestamp}`;
