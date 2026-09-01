@@ -1,0 +1,349 @@
+/* ============================================================
+   theme-default.css — 默认主题（暖纸风格）
+   ============================================================ */
+
+:root {
+    /* 背景色 */
+    --theme-bg-primary: #faf8f5;
+    --theme-bg-secondary: #f5f1ec;
+    --theme-bg-card: #fcf9f5;
+    --theme-bg-code: #2a2838;
+
+    /* 文字色 */
+    --theme-text-primary: #1e1e1e;
+    --theme-text-secondary: #5a4f42;
+    --theme-text-muted: #8a7a6a;
+    --theme-text-light: #e6d9c6;
+
+    /* 边框色 */
+    --theme-border-light: #e6ddd2;
+    --theme-border-medium: #d6cec4;
+    --theme-border-dark: #c9a86c;
+
+    /* 强调色 */
+    --theme-accent: #c9a86c;
+    --theme-accent-hover: #dbb87a;
+    --theme-accent-dark: #b3945a;
+
+    /* 卡片 */
+    --theme-card-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+
+    /* 字体 */
+    --theme-font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    --theme-font-size-base: 16px;
+    --theme-line-height: 1.8;
+
+    /* 特殊元素 */
+    --theme-dialogue-bg: #f2ede8;
+    --theme-dialogue-border: #c9a86c;
+    --theme-details-header: #f5f1ec;
+    --theme-details-header-hover: #ede8e0;
+}
+
+/* ---- 覆盖 markdown-body 基础样式 ---- */
+.markdown-body {
+    font-family: var(--theme-font-family);
+    font-size: var(--theme-font-size-base);
+    line-height: var(--theme-line-height);
+    color: var(--theme-text-primary);
+}
+
+/* ---- 卡片 ---- */
+.markdown-body .custom-card {
+    background: var(--theme-bg-card);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    border: 1px solid var(--theme-border-light);
+    box-shadow: var(--theme-card-shadow);
+}
+
+/* ---- div.H (地点/时间/指数) ---- */
+.markdown-body .H {
+    background: var(--theme-bg-secondary);
+    border-left: 4px solid var(--theme-accent);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 20px;
+    font-size: 14px;
+}
+
+.markdown-body .H .h {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.markdown-body .H .L {
+    font-weight: 600;
+    color: var(--theme-text-secondary);
+    min-width: 36px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.markdown-body .H .V {
+    color: var(--theme-text-primary);
+}
+
+.markdown-body .H .V.A {
+    color: #b33a3a;
+    font-weight: 600;
+}
+
+/* ---- div.P (对话气泡) ---- */
+.markdown-body .P {
+    background: var(--theme-dialogue-bg);
+    border-radius: 12px 12px 12px 4px;
+    padding: 12px 18px;
+    margin: 12px 0 12px 20px;
+    border-left: 3px solid var(--theme-dialogue-border);
+    font-style: normal;
+    color: var(--theme-text-primary);
+    line-height: 1.7;
+    position: relative;
+}
+
+.markdown-body .P::before {
+    content: '💬';
+    position: absolute;
+    left: -28px;
+    top: 8px;
+    font-size: 14px;
+    opacity: 0.5;
+}
+
+.markdown-body .P .P {
+    margin: 8px 0 0 0;
+    border-left-color: #b3a088;
+    background: #f7f3ee;
+}
+
+.markdown-body .P .P::before {
+    content: '';
+}
+
+/* ---- div.B (行动代号容器) ---- */
+.markdown-body .B {
+    background: var(--theme-bg-secondary);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    border: 1px solid var(--theme-border-light);
+}
+
+.markdown-body .B .T {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--theme-text-secondary);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--theme-border-medium);
+}
+
+/* ---- details.D (折叠面板) - 统一样式 ---- */
+.markdown-body .D {
+    background: var(--theme-bg-card);
+    border-radius: 8px;
+    margin: 6px 0;
+    border: 1px solid var(--theme-border-light);
+    overflow: hidden;
+}
+
+.markdown-body .D[open] {
+    border-color: var(--theme-accent);
+}
+
+.markdown-body .D .S {
+    cursor: pointer;
+    padding: 10px 14px;
+    font-weight: 500;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--theme-details-header);
+    transition: background 0.15s;
+    user-select: none;
+}
+
+.markdown-body .D .S:hover {
+    background: var(--theme-details-header-hover);
+}
+
+.markdown-body .D .S::-webkit-details-marker {
+    display: none;
+}
+
+.markdown-body .D .S .c {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.markdown-body .D .S .n {
+    font-weight: 600;
+    color: var(--theme-text-primary);
+}
+
+.markdown-body .D .S .r {
+    font-size: 12px;
+    color: var(--theme-text-muted);
+    background: var(--theme-border-light);
+    padding: 0 10px;
+    border-radius: 12px;
+}
+
+.markdown-body .D .C {
+    padding: 12px 16px 16px 16px;
+    background: var(--theme-bg-card);
+    border-top: 1px solid var(--theme-border-light);
+}
+
+.markdown-body .D .C .R {
+    display: flex;
+    gap: 6px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--theme-border-light);
+}
+
+.markdown-body .D .C .R .k {
+    font-weight: 600;
+    color: var(--theme-text-secondary);
+    min-width: 64px;
+}
+
+.markdown-body .D .C .R .v {
+    color: var(--theme-text-primary);
+}
+
+.markdown-body .D .C .G {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.markdown-body .D .C .G .i {
+    padding: 4px 0 4px 12px;
+    border-left: 3px solid #b3a088;
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+}
+
+.markdown-body .D .C .G .gl {
+    font-weight: 500;
+    color: var(--theme-text-secondary);
+    min-width: 36px;
+    font-size: 12px;
+}
+
+.markdown-body .D .C .G .gv {
+    color: var(--theme-text-primary);
+}
+
+.markdown-body .D .C .O {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--theme-border-light);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    font-size: 13px;
+}
+
+.markdown-body .D .C .O .o {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+}
+
+.markdown-body .D .C .O .ot {
+    font-weight: 600;
+    color: var(--theme-text-secondary);
+    min-width: 56px;
+    font-size: 12px;
+}
+
+.markdown-body .D .C .O .od {
+    color: var(--theme-text-primary);
+}
+
+/* ---- 特殊标识微调 ---- */
+.markdown-body .D.U .S {
+    background: var(--theme-details-header);
+    border-left: 3px solid var(--theme-accent);
+}
+
+.markdown-body .D.K .S {
+    background: var(--theme-details-header);
+    border-left: 3px solid #7a8a7a;
+}
+
+.markdown-body .D.M .S {
+    background: var(--theme-details-header);
+    border-left: 3px solid #8a7a9a;
+}
+
+.markdown-body .D.M .S .n {
+    font-size: 12px;
+    color: var(--theme-text-muted);
+    font-weight: 400;
+}
+
+/* ---- 其它 Markdown 元素 ---- */
+.markdown-body hr {
+    border: none;
+    border-top: 2px solid var(--theme-border-light);
+    margin: 24px 0;
+}
+
+.markdown-body blockquote {
+    border-left: 4px solid var(--theme-accent);
+    padding: 10px 16px;
+    margin: 12px 0;
+    background: var(--theme-bg-secondary);
+    border-radius: 0 8px 8px 0;
+    color: var(--theme-text-primary);
+}
+
+.markdown-body pre {
+    background: var(--theme-bg-code);
+    padding: 14px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    color: var(--theme-text-light);
+    font-size: 13px;
+}
+
+.markdown-body code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+}
+
+.markdown-body table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+    font-size: 14px;
+}
+
+.markdown-body th,
+.markdown-body td {
+    border: 1px solid var(--theme-border-medium);
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.markdown-body th {
+    background: var(--theme-bg-secondary);
+    font-weight: 600;
+}
