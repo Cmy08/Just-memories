@@ -148,10 +148,35 @@
 /* ---- details.D (折叠面板) - 统一样式 ---- */
 .markdown-body .D {
     background: var(--theme-bg-card);
-    border-radius: 8px;
-    margin: 6px 0;
-    border: 1px solid var(--theme-border-light);
+    border-radius: 12px;
+    margin: 8px 0;
+    border: 2px solid var(--theme-border-medium);
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.markdown-body .D[open] {
+    border-color: var(--theme-accent);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* 标题区域增加圆角 */
+.markdown-body .D .S {
+    cursor: pointer;
+    padding: 10px 16px;
+    font-weight: 500;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--theme-details-header);
+    transition: background 0.15s, border-radius 0.2s;
+    user-select: none;
+    border-radius: 10px 10px 0 0;
+}
+
+.markdown-body .D:not([open]) .S {
+    border-radius: 10px;
 }
 
 .markdown-body .D[open] {
