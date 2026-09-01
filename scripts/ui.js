@@ -6,12 +6,10 @@
 const $ = id => document.getElementById(id);
 
 const dom = {
-    // 侧边栏
     projectList: $('projectList'),
     newProjectBtn: $('newProjectBtn'),
     clearAllBtn: $('clearAllBtn'),
 
-    // 主面板
     projectName: $('projectName'),
     fileCount: $('fileCount'),
     fileListContainer: $('fileListContainer'),
@@ -23,25 +21,15 @@ const dom = {
     statusBar: $('statusBar'),
     scrollInfo: $('scrollInfo'),
 
-    // 模式切换
     modeTabs: document.querySelectorAll('.mode-tab'),
     viewModeBtn: document.querySelector('.mode-tab[data-mode="view"]'),
     editModeBtn: document.querySelector('.mode-tab[data-mode="edit"]'),
 
-    // 主题
     themeSelector: $('themeSelector'),
-
-    // 导出
     exportBtn: $('exportBtn'),
-
-    // 文件上传
     zipUpload: $('zipUpload'),
-
-    // 加载遮罩
     loadingOverlay: $('loadingOverlay'),
     loadingText: $('loadingText'),
-
-    // 内容区域（用于滚动）
     viewContainer: $('viewContainer'),
 };
 
@@ -50,6 +38,16 @@ let currentProjectId = null;
 let currentFilename = null;
 let currentMode = 'view';
 let isEditDirty = false;
+
+// 保存当前编辑内容（供 draft.js 调用）
+window._saveCurrentEdit = function() {
+    if (currentMode === 'edit' && currentProjectId && currentFilename) {
+        const content = dom.editTextarea.value;
+        updateProjectFile(currentProjectId, currentFilename, content, true);
+        return true;
+    }
+    return false;
+};
 
 // ===== 加载遮罩 =====
 function showLoading(msg = '处理中...') {
@@ -77,7 +75,6 @@ function renderProjects() {
         return;
     }
 
-    // 按最后修改时间排序
     projects.sort((a, b) => (b.lastModified || 0) - (a.lastModified || 0));
 
     let html = '';
@@ -99,10 +96,8 @@ function renderProjects() {
     }
     container.innerHTML = html;
 
-    // 绑定事件
     container.querySelectorAll('.project-item').forEach(el => {
         el.addEventListener('click', function(e) {
-            // 如果点击的是删除按钮，不触发选择
             if (e.target.classList.contains('delete-project')) return;
             const id = this.dataset.projectId;
             if (id) selectProject(id);
@@ -122,6 +117,7 @@ function renderProjects() {
                 }
                 renderProjects();
                 updateMainPanel();
+                showDraftReminder();
             }
         });
     });
@@ -132,21 +128,18 @@ function selectProject(projectId) {
     const project = getProject(projectId);
     if (!project) return;
 
-    // 如果当前在编辑模式，保存编辑内容
     if (currentMode === 'edit' && currentProjectId && currentFilename) {
         const content = dom.editTextarea.value;
         updateProjectFile(currentProjectId, currentFilename, content, true);
     }
 
     currentProjectId = projectId;
-    // 默认选择第一个文件
     const fileList = project.fileList || Object.keys(project.files || {});
     currentFilename = fileList.length > 0 ? fileList[0] : null;
 
     renderProjects();
     updateMainPanel();
 
-    // 如果当前是编辑模式，切换到查看模式（更符合直觉）
     if (currentMode === 'edit') {
         setMode('view');
     } else {
@@ -163,7 +156,6 @@ function updateMainPanel() {
         const fileCount = Object.keys(project.files || {}).length;
         dom.fileCount.textContent = `${fileCount} 个文件`;
 
-        // 渲染文件列表栏
         const fileList = project.fileList || Object.keys(project.files || {});
         let html = '';
         for (const name of fileList) {
@@ -173,7 +165,6 @@ function updateMainPanel() {
         }
         dom.fileListContainer.innerHTML = html || '<span style="color:#8a7a6a;">无文件</span>';
 
-        // 绑定文件点击事件
         dom.fileListContainer.querySelectorAll('.file-chip').forEach(el => {
             el.addEventListener('click', function() {
                 const name = this.dataset.filename;
@@ -183,7 +174,6 @@ function updateMainPanel() {
             });
         });
 
-        // 更新状态栏
         dom.statusBar.textContent = `项目: ${project.name} | 文件: ${fileCount} 个`;
     } else {
         dom.projectName.textContent = '未选择项目';
@@ -192,7 +182,6 @@ function updateMainPanel() {
         dom.statusBar.textContent = '就绪';
     }
 
-    // 如果当前有文件，渲染内容
     if (currentProjectId && currentFilename) {
         renderContent();
     } else {
@@ -205,7 +194,6 @@ function selectFile(filename) {
     const project = currentProjectId ? getProject(currentProjectId) : null;
     if (!project || !project.files[filename]) return;
 
-    // 如果当前在编辑模式，保存编辑内容
     if (currentMode === 'edit' && currentProjectId && currentFilename) {
         const content = dom.editTextarea.value;
         updateProjectFile(currentProjectId, currentFilename, content, true);
@@ -225,27 +213,19 @@ function renderContent() {
     }
 
     const content = project.files[currentFilename].content || '';
-
-    // 更新编辑框
     dom.editTextarea.value = content;
 
-    // 渲染查看模式
     const html = renderMarkdown(content);
     dom.markdownBody.innerHTML = html;
 
-    // 更新文件状态
     const isModified = project.files[currentFilename].modified;
     dom.fileStatus.textContent = isModified ? '✏️ 已修改' : '';
     dom.fileStatus.className = 'mode-status' + (isModified ? ' saved' : '');
 
-    // 恢复滚动位置
     const scrollKey = `${currentProjectId}_${currentFilename}`;
     restoreScrollPosition(dom.viewContainer, scrollKey);
 
-    // 更新滚动信息
     updateScrollInfo();
-
-    // 更新文件列表高亮
     updateFileListHighlight();
 }
 
@@ -285,7 +265,6 @@ function setMode(mode) {
     if (mode === 'view') {
         dom.viewContainer.classList.remove('hidden');
         dom.editContainer.classList.add('hidden');
-        // 恢复滚动位置
         if (currentProjectId && currentFilename) {
             const scrollKey = `${currentProjectId}_${currentFilename}`;
             restoreScrollPosition(dom.viewContainer, scrollKey);
@@ -293,12 +272,10 @@ function setMode(mode) {
     } else {
         dom.viewContainer.classList.add('hidden');
         dom.editContainer.classList.remove('hidden');
-        // 确保编辑框有最新内容
         if (currentProjectId && currentFilename) {
             const project = getProject(currentProjectId);
             if (project && project.files[currentFilename]) {
                 dom.editTextarea.value = project.files[currentFilename].content || '';
-                // 恢复光标位置
                 const cursorKey = `${currentProjectId}_${currentFilename}`;
                 restoreCursorPosition(dom.editTextarea, cursorKey);
             }
@@ -306,7 +283,6 @@ function setMode(mode) {
         dom.editTextarea.focus();
     }
 
-    // 保存模式偏好
     try {
         localStorage.setItem('mdEditor_mode', mode);
     } catch (e) { /* ignore */ }
@@ -321,7 +297,6 @@ function initThemeSelector() {
     dom.themeSelector.addEventListener('change', function() {
         const theme = this.value;
         applyTheme(theme);
-        // 重新渲染当前内容以应用主题样式
         if (currentProjectId && currentFilename) {
             const project = getProject(currentProjectId);
             if (project && project.files[currentFilename]) {
@@ -346,7 +321,6 @@ async function exportCurrentProject() {
         return;
     }
 
-    // 如果当前在编辑模式，保存编辑内容
     if (currentMode === 'edit' && currentProjectId && currentFilename) {
         const content = dom.editTextarea.value;
         updateProjectFile(currentProjectId, currentFilename, content, true);
@@ -362,10 +336,8 @@ async function exportCurrentProject() {
         const blob = await packProjectToZip(files, `${project.name}_export.zip`);
         saveAs(blob, `${project.name}_export.zip`);
 
-        // 清除修改标记
         clearProjectModifiedFlags(currentProjectId);
 
-        // 刷新界面
         renderProjects();
         updateMainPanel();
 
@@ -388,7 +360,7 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// ===== 滚动监听（保存滚动位置） =====
+// ===== 滚动监听 =====
 function initScrollListener() {
     dom.viewContainer.addEventListener('scroll', function() {
         if (currentProjectId && currentFilename) {
@@ -399,7 +371,7 @@ function initScrollListener() {
     });
 }
 
-// ===== 编辑框光标监听 =====
+// ===== 编辑框监听 =====
 function initEditListener() {
     dom.editTextarea.addEventListener('scroll', function() {
         if (currentProjectId && currentFilename && currentMode === 'edit') {
@@ -423,9 +395,41 @@ function initEditListener() {
     });
 }
 
+// ===== 处理压缩包上传 =====
+async function handleZipUpload(file) {
+    showLoading('正在解压压缩包...');
+
+    try {
+        const result = await parseZipFile(file);
+
+        const project = upsertProject(
+            result.projectId,
+            result.projectName,
+            result.files,
+            result.fileList
+        );
+
+        currentProjectId = project.id;
+        const fileList = project.fileList || Object.keys(project.files || {});
+        currentFilename = fileList.length > 0 ? fileList[0] : null;
+
+        renderProjects();
+        updateMainPanel();
+        setMode('view');
+
+        hideLoading();
+        dom.statusBar.textContent = `✅ 已加载项目「${project.name}」，${Object.keys(project.files).length} 个文件`;
+        showDraftReminder();
+
+    } catch (e) {
+        console.error('上传失败:', e);
+        hideLoading();
+        alert('❌ 处理压缩包失败: ' + e.message);
+    }
+}
+
 // ===== 初始化 =====
 function initUI() {
-    // 恢复模式偏好
     try {
         const savedMode = localStorage.getItem('mdEditor_mode');
         if (savedMode === 'edit') {
@@ -433,30 +437,24 @@ function initUI() {
         }
     } catch (e) { /* ignore */ }
 
-    // 初始化主题
     initThemeSelector();
-
-    // 渲染项目列表
     renderProjects();
 
-    // 如果有项目，自动选择第一个
     const projects = getProjects();
     if (projects.length > 0) {
         currentProjectId = projects[0].id;
         const fileList = projects[0].fileList || Object.keys(projects[0].files || {});
         currentFilename = fileList.length > 0 ? fileList[0] : null;
         updateMainPanel();
-        // 应用保存的模式
         setMode(currentMode);
     } else {
         updateMainPanel();
         setMode('view');
     }
 
-    // 绑定事件
+    // 模式切换
     dom.viewModeBtn.addEventListener('click', function() {
         if (currentMode === 'view') return;
-        // 保存编辑内容
         if (currentProjectId && currentFilename) {
             const content = dom.editTextarea.value;
             updateProjectFile(currentProjectId, currentFilename, content, true);
@@ -501,7 +499,44 @@ function initUI() {
             updateMainPanel();
             clearEditor();
             dom.statusBar.textContent = '已清除所有项目';
+            showDraftReminder();
         }
+    });
+
+    // 导出草稿
+    document.getElementById('exportDraftBtn')?.addEventListener('click', function() {
+        exportDraft();
+        showDraftReminder();
+    });
+
+    // 导入草稿
+    document.getElementById('importDraftInput')?.addEventListener('change', async function(e) {
+        const file = this.files[0];
+        if (!file) return;
+
+        showLoading('正在导入草稿...');
+        try {
+            const projects = await importDraft(file);
+            renderProjects();
+            if (projects.length > 0) {
+                currentProjectId = projects[0].id;
+                const fileList = projects[0].fileList || Object.keys(projects[0].files || {});
+                currentFilename = fileList.length > 0 ? fileList[0] : null;
+                updateMainPanel();
+                setMode('view');
+            }
+            hideLoading();
+            dom.statusBar.textContent = `✅ 成功导入 ${projects.length} 个项目`;
+            showDraftReminder();
+        } catch (e) {
+            hideLoading();
+            alert('❌ 导入失败: ' + e.message);
+        }
+        this.value = '';
+    });
+
+    document.getElementById('importDraftLabel')?.addEventListener('click', function() {
+        document.getElementById('importDraftInput')?.click();
     });
 
     // 拖拽上传
@@ -550,61 +585,11 @@ function initUI() {
         }
     });
 
-    // 滚动和编辑监听
     initScrollListener();
     initEditListener();
+
+    // 延迟检查草稿提醒
+    setTimeout(showDraftReminder, 2000);
 }
 
-// ===== 处理压缩包上传 =====
-async function handleZipUpload(file) {
-    showLoading('正在解压压缩包...');
-
-    try {
-        const result = await parseZipFile(file);
-
-        // 检查项目数量限制
-        const projects = getProjects();
-        if (projects.length >= MAX_PROJECTS) {
-            const confirmMsg =
-                `已达到最大项目数量 (${MAX_PROJECTS} 个)。\n是否删除最旧的项目以腾出空间？\n\n当前项目：\n${projects.map(p => `• ${p.name} (${Object.keys(p.files).length} 个文件)`).join('\n')}`;
-            if (!confirm(confirmMsg)) {
-                hideLoading();
-                return;
-            }
-            // 删除最旧的项目
-            projects.sort((a, b) => (a.lastModified || 0) - (b.lastModified || 0));
-            const toDelete = projects.slice(0, projects.length - MAX_PROJECTS + 1);
-            for (const p of toDelete) {
-                deleteProject(p.id);
-            }
-        }
-
-        // 保存项目
-        const project = upsertProject(
-            result.projectId,
-            result.projectName,
-            result.files,
-            result.fileList
-        );
-
-        // 自动选择此项目
-        currentProjectId = project.id;
-        const fileList = project.fileList || Object.keys(project.files || {});
-        currentFilename = fileList.length > 0 ? fileList[0] : null;
-
-        renderProjects();
-        updateMainPanel();
-        setMode('view');
-
-        hideLoading();
-        dom.statusBar.textContent = `✅ 已加载项目「${project.name}」，${Object.keys(project.files).length} 个文件`;
-
-    } catch (e) {
-        console.error('上传失败:', e);
-        hideLoading();
-        alert('❌ 处理压缩包失败: ' + e.message);
-    }
-}
-
-// 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', initUI);
