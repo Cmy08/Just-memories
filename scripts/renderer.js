@@ -15,7 +15,6 @@ function renderMarkdown(content, forceRefresh = false) {
 
     try {
         const html = marked.parse(content);
-        // 缓存
         if (renderCache.size > MAX_CACHE_SIZE) {
             const firstKey = renderCache.keys().next().value;
             renderCache.delete(firstKey);
@@ -33,7 +32,6 @@ function applyTheme(themeName) {
     const link = document.getElementById('themeStylesheet');
     if (!link) return;
 
-    // 移除旧的主题类
     document.documentElement.classList.remove('theme-default', 'theme-cyberpunk');
 
     if (themeName === 'cyberpunk') {
@@ -44,7 +42,6 @@ function applyTheme(themeName) {
         document.documentElement.classList.add('theme-default');
     }
 
-    // 保存主题偏好
     try {
         localStorage.setItem('mdEditor_theme', themeName);
     } catch (e) { /* ignore */ }
@@ -115,7 +112,6 @@ function restoreCursorPosition(textarea, key) {
             if (data.scrollTop !== undefined) {
                 textarea.scrollTop = data.scrollTop;
             }
-            // 聚焦
             textarea.focus();
         }
     } catch (e) { /* ignore */ }
