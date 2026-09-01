@@ -1,9 +1,8 @@
 // ============================================================
-// storage.js — 多项目管理（缓存最多3个项目）
+// storage.js — 多项目管理（无数量限制）
 // ============================================================
 
 const STORAGE_KEY = 'mdEditor_v2_projects';
-const MAX_PROJECTS = 3;
 
 /**
  * 项目数据结构：
@@ -35,12 +34,6 @@ function getProjects() {
 /** 保存项目列表 */
 function saveProjects(projects) {
     try {
-        // 限制最大项目数
-        if (projects.length > MAX_PROJECTS) {
-            // 按最后修改时间排序，保留最新的
-            projects.sort((a, b) => (b.lastModified || 0) - (a.lastModified || 0));
-            projects = projects.slice(0, MAX_PROJECTS);
-        }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
         return true;
     } catch (e) {
@@ -59,7 +52,6 @@ function getProject(projectId) {
 function upsertProject(projectId, projectName, files, fileList) {
     const projects = getProjects();
 
-    // 检查是否已存在
     const existingIndex = projects.findIndex(p => p.id === projectId);
 
     const now = Date.now();
@@ -72,16 +64,12 @@ function upsertProject(projectId, projectName, files, fileList) {
     };
 
     if (existingIndex >= 0) {
-        // 更新已有项目，保留修改标记
         const existing = projects[existingIndex];
-        // 合并文件：保留已有文件的修改标记，新增文件
         const mergedFiles = { ...existing.files };
         for (const [key, value] of Object.entries(projectData.files)) {
             if (mergedFiles[key]) {
-                // 如果已存在，且新内容与旧内容不同，保留用户的修改标记
                 if (mergedFiles[key].content !== value.content) {
                     mergedFiles[key].content = value.content;
-                    // 如果用户已经修改过，保留 modified 标记
                     if (!mergedFiles[key].modified) {
                         mergedFiles[key].modified = false;
                     }
@@ -90,7 +78,6 @@ function upsertProject(projectId, projectName, files, fileList) {
                 mergedFiles[key] = value;
             }
         }
-        // 更新文件列表顺序
         const mergedFileList = [...new Set([...projectData.fileList, ...existing.fileList])];
         projects[existingIndex] = {
             ...existing,
@@ -99,14 +86,7 @@ function upsertProject(projectId, projectName, files, fileList) {
             lastModified: now
         };
     } else {
-        // 新项目
         projects.push(projectData);
-    }
-
-    // 限制数量
-    if (projects.length > MAX_PROJECTS) {
-        projects.sort((a, b) => (b.lastModified || 0) - (a.lastModified || 0));
-        projects.length = MAX_PROJECTS;
     }
 
     saveProjects(projects);
@@ -148,7 +128,6 @@ function updateProjectFile(projectId, filename, content, markModified = true) {
     }
     project.lastModified = Date.now();
 
-    // 如果文件不在列表中，添加
     if (!project.fileList.includes(filename)) {
         project.fileList.push(filename);
     }
