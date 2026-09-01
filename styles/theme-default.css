@@ -145,22 +145,24 @@
     border-bottom: 1px dashed var(--theme-border-medium);
 }
 
-/* ---- details.D (折叠面板) - 统一样式 ---- */
+/* ============================================================
+   details.D (折叠面板) — 统一卡片样式
+   ============================================================ */
 .markdown-body .D {
     background: var(--theme-bg-card);
     border-radius: 12px;
     margin: 8px 0;
-    border: 2px solid var(--theme-border-medium);
+    border: 1px solid var(--theme-border-light);
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .markdown-body .D[open] {
     border-color: var(--theme-accent);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(201, 168, 108, 0.10);
 }
 
-/* 标题区域增加圆角 */
 .markdown-body .D .S {
     cursor: pointer;
     padding: 10px 16px;
@@ -170,30 +172,13 @@
     align-items: center;
     justify-content: space-between;
     background: var(--theme-details-header);
-    transition: background 0.15s, border-radius 0.2s;
+    transition: background 0.15s;
     user-select: none;
-    border-radius: 10px 10px 0 0;
+    border-radius: 12px 12px 0 0;
 }
 
 .markdown-body .D:not([open]) .S {
-    border-radius: 10px;
-}
-
-.markdown-body .D[open] {
-    border-color: var(--theme-accent);
-}
-
-.markdown-body .D .S {
-    cursor: pointer;
-    padding: 10px 14px;
-    font-weight: 500;
-    list-style: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--theme-details-header);
-    transition: background 0.15s;
-    user-select: none;
+    border-radius: 12px;
 }
 
 .markdown-body .D .S:hover {
@@ -204,11 +189,25 @@
     display: none;
 }
 
+.markdown-body .D .S::before {
+    content: '▶';
+    font-size: 12px;
+    color: var(--theme-text-muted);
+    margin-right: 8px;
+    transition: transform 0.2s;
+    order: -1;
+}
+
+.markdown-body .D[open] .S::before {
+    transform: rotate(90deg);
+}
+
 .markdown-body .D .S .c {
     display: flex;
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+    flex: 1;
 }
 
 .markdown-body .D .S .n {
@@ -230,13 +229,29 @@
     border-top: 1px solid var(--theme-border-light);
 }
 
+/* 嵌套折叠面板 */
+.markdown-body .D .D {
+    margin: 6px 0;
+    border-radius: 10px;
+}
+
+.markdown-body .D .D .S {
+    border-radius: 10px 10px 0 0;
+    padding: 8px 14px;
+    font-size: 13px;
+}
+
+.markdown-body .D .D:not([open]) .S {
+    border-radius: 10px;
+}
+
 .markdown-body .D .C .R {
     display: flex;
     gap: 6px;
     font-size: 14px;
     margin-bottom: 10px;
     padding-bottom: 8px;
-    border-bottom: 1px dashed var(--theme-border-light);
+    border-bottom: 1px solid var(--theme-border-light);
 }
 
 .markdown-body .D .C .R .k {
