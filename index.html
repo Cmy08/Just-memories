@@ -21,6 +21,7 @@
     <script src="scripts/storage.js" defer></script>
     <script src="scripts/zip-handler.js" defer></script>
     <script src="scripts/renderer.js" defer></script>
+    <script src="scripts/draft.js" defer></script>
     <script src="scripts/ui.js" defer></script>
     <script src="scripts/app.js" defer></script>
 </head>
@@ -53,7 +54,12 @@
                 </div>
             </div>
             <div class="sidebar-footer">
-                <button id="clearAllBtn" class="btn-danger">🗑️ 清除所有</button>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <button id="exportDraftBtn" class="btn-secondary" style="flex:1;">💾 导出草稿</button>
+                    <label id="importDraftLabel" class="btn-secondary" style="flex:1;text-align:center;cursor:pointer;">📂 导入草稿</label>
+                    <input type="file" id="importDraftInput" accept=".json" style="display:none;" />
+                </div>
+                <button id="clearAllBtn" class="btn-danger" style="margin-top:8px;">🗑️ 清除所有</button>
             </div>
         </aside>
 
@@ -72,10 +78,11 @@
                         <option value="cyberpunk">💠 赛博朋克</option>
                     </select>
                     <button id="exportBtn" class="btn-primary">📦 导出压缩包</button>
-<button id="downloadDraftBtn" class="btn-secondary">💾 下载草稿</button>
-<button id="uploadDraftBtn" class="btn-secondary">📂 导入草稿</button>
                 </div>
             </header>
+
+            <!-- 草稿提醒栏 -->
+            <div id="draftReminder" class="draft-reminder hidden"></div>
 
             <!-- 文件列表（当项目选中时显示） -->
             <div class="file-list-bar" id="fileListBar">
